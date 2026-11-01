@@ -1,9 +1,7 @@
 # Cardo
 
-Cardo is a private Android voice assistant for Samsung, Google Pixel, and Xiaomi phones.
+Cardo is a private voice assistant for Android. Say "Cardo" and it handles calls, messages, alarms, timers, reminders, calendar, apps, music and device settings in English or Spanish — like iPhone 13-era Siri, but entirely on your phone.
 
-The goal is old-Siri-style phone control without AI, cloud processing, telemetry, or a backend.
-Cardo should run as the selected Android assistant, wake to "Hey Cardo" or "Oye Cardo" where the OS/OEM hotword path allows it, parse fixed English and Spanish commands locally, and hand off only user-requested internet searches to the user's chosen apps.
+**Cardo has no internet permission.** Speech recognition, understanding and its voice all run on the device. Nothing you say is sent anywhere or used for training.
 
-Design starts in [docs/superpowers/specs/2026-06-26-cardo-mvp-design.md](docs/superpowers/specs/2026-06-26-cardo-mvp-design.md).
-
+Status: in development. Design: [docs/superpowers/specs/2026-11-01-cardo-v1-design.md](docs/superpowers/specs/2026-11-01-cardo-v1-design.md).

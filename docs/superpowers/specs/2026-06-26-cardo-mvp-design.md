@@ -1,5 +1,7 @@
 # Cardo MVP Design
 
+> **Superseded** by [2026-11-01-cardo-v1-design.md](2026-11-01-cardo-v1-design.md). Kept for history: its OS-hotword and no-AI assumptions were replaced.
+
 Date: 2026-06-26
 
 ## Goal
