@@ -74,7 +74,7 @@ FaceTime, HomeKit, Find My, Apple Pay equivalents; general chat or knowledge ans
 | `:app` | Android app | `CardoVoiceInteractionService`, session service and session UI, `ListeningService` (foreground, microphone), `MessageListenerService` (notification listener), onboarding, home, settings, reminders, notes, design system, flower animation | all of the above |
 | `ml/` | Python tooling (not shipped) | Dataset generation, model training/export, tokenizer golden files, wake/ASR/TTS bake-off, audio test-fixture synthesis | — |
 
-The understanding model runs through ONNX Runtime. sherpa-onnx already ships `libonnxruntime.so`; the build must end up with exactly one copy at one version (verified in the foundation milestone).
+The understanding model runs through ONNX Runtime (`onnxruntime-android`; the desktop `onnxruntime` jar in JVM tests, same `ai.onnxruntime` API). The voice engine uses sherpa-onnx's static-link AAR, which carries its own ONNX Runtime inside `libsherpa-onnx-jni.so`, so the two never clash over `libonnxruntime.so` (about 15 MB extra, accepted).
 
 ### Key interfaces (in `:brain` unless noted)
 
@@ -300,7 +300,7 @@ Permissions are requested in context the first time a feature needs them, never 
    - Android SDK, emulator and system image on the dev machine.
    - Gradle project with all modules and the shared interfaces and command schema.
    - CI, manifest check, private GitHub repo.
-   - One ONNX Runtime copy verified.
+   - sherpa-onnx (static-link AAR) and ONNX Runtime packaged together without conflicts.
 2. **Parallel tracks** (separate worktrees):
    - Brain rules and dialog
    - Understanding model (data, training, export, Kotlin inference)
