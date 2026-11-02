@@ -1,3 +1,5 @@
+import java.util.Properties
+
 import com.android.build.api.artifact.SingleArtifact
 
 plugins {
@@ -32,7 +34,7 @@ android {
     // committed). Without that file the release variant stays unsigned, which is what CI builds.
     val keystoreProps = File(System.getProperty("user.home"), ".cardo-keys/keystore.properties")
     val releaseSigning = if (keystoreProps.isFile) {
-        val props = java.util.Properties().apply { keystoreProps.inputStream().use { load(it) } }
+        val props = Properties().apply { keystoreProps.inputStream().use { load(it) } }
         signingConfigs.create("release") {
             storeFile = file(props.getProperty("storeFile"))
             storePassword = props.getProperty("storePassword")
