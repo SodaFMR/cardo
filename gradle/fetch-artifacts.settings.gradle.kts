@@ -20,30 +20,57 @@ fun sha256Of(file: File): String {
     return digest.digest().joinToString("") { "%02x".format(it) }
 }
 
+fun download(name: String, url: String, target: File) {
+    val connection = java.net.URI(url).toURL().openConnection()
+    connection.connectTimeout = 30_000
+    connection.readTimeout = 120_000
+    try {
+        connection.getInputStream().use { Files.copy(it, target.toPath(), REPLACE_EXISTING) }
+    } catch (e: java.io.IOException) {
+        throw GradleException("Failed to download $name from $url: ${e.message}", e)
+    }
+}
+
 fun fetchArtifact(name: String, url: String, sha256: String, dest: File, cacheDir: File) {
     if (dest.isFile && sha256Of(dest) == sha256) return
 
     val cached = File(cacheDir, sha256)
-    val temp = File(dest.parentFile, dest.name + ".part")
-    dest.parentFile.mkdirs()
+    // Unique per process and call, so concurrent builds never write the same temp file.
+    val unique = ".part-${ProcessHandle.current().pid()}-${System.nanoTime()}"
+    val temp = File(dest.parentFile, dest.name + unique)
     try {
+        dest.parentFile.mkdirs()
+        var fromCache = false
         if (cached.isFile) {
             cached.copyTo(temp, overwrite = true)
-        } else {
+            if (sha256Of(temp) == sha256) {
+                fromCache = true
+            } else {
+                // A corrupt cache entry must not wedge the build: drop it and download once.
+                logger.warn("Cached copy of $name does not match its checksum; deleting it and re-downloading")
+                cached.delete()
+                temp.delete()
+            }
+        }
+        if (!fromCache) {
             logger.lifecycle("Downloading $name from $url")
-            java.net.URI(url).toURL().openStream().use { Files.copy(it, temp.toPath(), REPLACE_EXISTING) }
-        }
-        val actual = sha256Of(temp)
-        if (actual != sha256) {
-            throw GradleException("Checksum mismatch for $name: expected $sha256, got $actual")
-        }
-        if (!cached.isFile) {
+            download(name, url, temp)
+            val actual = sha256Of(temp)
+            if (actual != sha256) {
+                throw GradleException("Checksum mismatch for $name: expected $sha256, got $actual")
+            }
             cacheDir.mkdirs()
-            val cacheTemp = File(cacheDir, "$sha256.part")
-            temp.copyTo(cacheTemp, overwrite = true)
-            Files.move(cacheTemp.toPath(), cached.toPath(), REPLACE_EXISTING)
+            val cacheTemp = File(cacheDir, "$sha256$unique")
+            try {
+                temp.copyTo(cacheTemp, overwrite = true)
+                Files.move(cacheTemp.toPath(), cached.toPath(), REPLACE_EXISTING)
+            } finally {
+                cacheTemp.delete()
+            }
         }
         Files.move(temp.toPath(), dest.toPath(), REPLACE_EXISTING)
+    } catch (e: java.io.IOException) {
+        throw GradleException("Failed to fetch $name: ${e.message}", e)
     } finally {
         temp.delete()
     }

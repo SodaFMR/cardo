@@ -3,7 +3,7 @@ pluginManagement {
         google {
             content {
                 includeGroupByRegex("com\\.android(\\..*)?")
-                includeGroupByRegex("com\\.google\\.android(\\..*)?")
+                includeGroupByRegex("com\\.google\\..*")
                 includeGroupByRegex("androidx(\\..*)?")
             }
         }
@@ -12,13 +12,18 @@ pluginManagement {
     }
 }
 
+plugins {
+    // Provisions a JDK 17 for contributors who do not have one (jvmToolchain(17)).
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
         google {
             content {
                 includeGroupByRegex("com\\.android(\\..*)?")
-                includeGroupByRegex("com\\.google\\.android(\\..*)?")
+                includeGroupByRegex("com\\.google\\..*")
                 includeGroupByRegex("androidx(\\..*)?")
             }
         }

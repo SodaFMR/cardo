@@ -4,15 +4,10 @@ plugins {
 
 android {
     namespace = "io.github.sodafmr.cardo.voice"
-    compileSdk = 37
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 31
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     testOptions {
