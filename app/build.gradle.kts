@@ -1,6 +1,18 @@
+import com.android.build.api.artifact.SingleArtifact
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+apply(from = rootProject.file("gradle/privacy-check.gradle.kts"))
+
+@Suppress("UNCHECKED_CAST")
+val registerNoInternetCheck = extra["registerNoInternetCheck"] as (String, Provider<RegularFile>) -> Unit
+androidComponents {
+    onVariants { variant ->
+        registerNoInternetCheck(variant.name, variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
+    }
 }
 
 android {
