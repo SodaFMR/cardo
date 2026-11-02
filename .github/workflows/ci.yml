@@ -40,3 +40,15 @@ jobs:
       - run: ./gradlew build --stacktrace
 
       - run: scripts/check-apk-libs.sh app/build/outputs/apk/debug/app-debug.apk
+
+      # No keystore on the runner, so this release APK is unsigned: for testers, not for publishing.
+      - run: ./gradlew :app:assembleRelease --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cardo-apks
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
+          retention-days: 14
