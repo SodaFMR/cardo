@@ -3,4 +3,9 @@
 *.iml
 build/
 local.properties
+.kotlin/
+third_party/
+*.keystore
+/captures
 
+.superpowers/
