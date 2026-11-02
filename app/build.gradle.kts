@@ -24,6 +24,15 @@ android {
         }
     }
 
+    packaging {
+        jniLibs {
+            // onnxruntime-android and the sherpa-onnx static AAR both ship their own lib/x86/libonnxruntime.so
+            // (different builds, so pickFirsts would be wrong). We only ship arm64-v8a and x86_64, so drop
+            // the ABIs we do not target before the native-lib merge sees them.
+            excludes += setOf("lib/x86/**", "lib/armeabi-v7a/**")
+        }
+    }
+
     buildFeatures {
         compose = true
     }
@@ -42,6 +51,7 @@ dependencies {
     implementation(project(":brain"))
     implementation(project(":voice"))
     implementation(project(":actions"))
+    implementation(libs.onnxruntime.android)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

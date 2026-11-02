@@ -26,6 +26,8 @@ dependencyResolutionManagement {
     }
 }
 
+apply(from = "gradle/fetch-artifacts.settings.gradle.kts")
+
 rootProject.name = "cardo"
 
 include(":brain", ":voice", ":actions", ":app")

@@ -7,6 +7,9 @@ kotlin {
 }
 
 dependencies {
+    compileOnly(libs.onnxruntime)
+    testImplementation(libs.onnxruntime)
+
     testImplementation(platform(libs.junit5.bom))
     testImplementation(libs.junit5.jupiter)
     testRuntimeOnly(libs.junit5.platform.launcher)

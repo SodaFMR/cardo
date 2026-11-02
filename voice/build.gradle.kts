@@ -25,6 +25,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(files("$rootDir/third_party/sherpa-onnx-static-2.0.1.aar"))
+
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
 }

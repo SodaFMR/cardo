@@ -1,0 +1,11 @@
+{
+  "artifacts": [
+    {
+      "name": "sherpa-onnx-static",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-static-link-onnxruntime-2.0.1.aar",
+      "sha256": "07e042d97f3a6bd5b7fe74d4eef0513dc01a714b16c15a903250095aba43a575",
+      "dest": "third_party/sherpa-onnx-static-2.0.1.aar",
+      "license": "Apache-2.0"
+    }
+  ]
+}
