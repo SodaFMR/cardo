@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Cardo is offline by design: strip INTERNET even if a library manifest requests it. -->
+    <!-- Cardo is offline by design: strip network permissions even if a library manifest requests them.
+         onnxruntime-android asks for both, solely for its telemetry client (removed below). -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -14,6 +16,13 @@
         android:allowBackup="false"
         android:label="Cardo"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+
+        <!-- onnxruntime-android's telemetry initializer; removed so the telemetry client never starts.
+             `tools:node="remove"` matches on android:name; the authority is informational. -->
+        <provider
+            android:name="ai.onnxruntime.TelemetryInitializer"
+            android:authorities="${applicationId}.onnxruntime_telemetry_initializer"
+            tools:node="remove" />
 
         <activity
             android:name=".MainActivity"

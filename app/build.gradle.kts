@@ -8,10 +8,10 @@ plugins {
 apply(from = rootProject.file("gradle/privacy-check.gradle.kts"))
 
 @Suppress("UNCHECKED_CAST")
-val registerNoInternetCheck = extra["registerNoInternetCheck"] as (String, Provider<RegularFile>) -> Unit
+val registerPrivacyCheck = extra["registerPrivacyCheck"] as (String, Provider<RegularFile>) -> Unit
 androidComponents {
     onVariants { variant ->
-        registerNoInternetCheck(variant.name, variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
+        registerPrivacyCheck(variant.name, variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
     }
 }
 
