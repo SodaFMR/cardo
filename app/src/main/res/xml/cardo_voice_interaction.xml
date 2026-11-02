@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<voice-interaction-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sessionService="io.github.sodafmr.cardo.assistant.CardoSessionService"
+    android:recognitionService="io.github.sodafmr.cardo.assistant.CardoRecognitionService"
+    android:settingsActivity="io.github.sodafmr.cardo.MainActivity"
+    android:supportsAssist="true"
+    android:supportsLaunchVoiceAssistFromKeyguard="true" />
