@@ -23,8 +23,24 @@ android {
         applicationId = "io.github.sodafmr.cardo"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "0.1.0"
+        // scripts/release.sh passes these on the command line; plain builds get the dev defaults.
+        versionCode = (providers.gradleProperty("cardoVersionCode").orNull ?: "1").toInt()
+        versionName = providers.gradleProperty("cardoVersionName").orNull ?: "0.1.0-dev"
+    }
+
+    // Release signing comes from ~/.cardo-keys/keystore.properties (created by scripts/release.sh, never
+    // committed). Without that file the release variant stays unsigned, which is what CI builds.
+    val keystoreProps = File(System.getProperty("user.home"), ".cardo-keys/keystore.properties")
+    val releaseSigning = if (keystoreProps.isFile) {
+        val props = java.util.Properties().apply { keystoreProps.inputStream().use { load(it) } }
+        signingConfigs.create("release") {
+            storeFile = file(props.getProperty("storeFile"))
+            storePassword = props.getProperty("storePassword")
+            keyAlias = props.getProperty("keyAlias")
+            keyPassword = props.getProperty("keyPassword")
+        }
+    } else {
+        null
     }
 
     buildTypes {
@@ -32,6 +48,7 @@ android {
             ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
         }
         release {
+            signingConfig = releaseSigning
             ndk { abiFilters += "arm64-v8a" }
         }
     }
