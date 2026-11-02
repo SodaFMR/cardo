@@ -13,6 +13,7 @@ dependencies {
     testImplementation(platform(libs.junit5.bom))
     testImplementation(libs.junit5.jupiter)
     testRuntimeOnly(libs.junit5.platform.launcher)
+    testImplementation(kotlin("reflect"))
 }
 
 tasks.test {
