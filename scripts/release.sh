@@ -83,13 +83,13 @@ if [[ ! -f $keystore ]]; then
     STORE_PW=$store_pw keytool -genkeypair -keystore "$keystore" -storetype PKCS12 \
         -storepass:env STORE_PW \
         -alias cardo -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Cardo" >/dev/null
-    umask 077
-    cat > "$props" <<PROPS
+    (umask 077 && cat > "$props" <<PROPS
 storeFile=$keystore
 storePassword=$store_pw
 keyAlias=cardo
 keyPassword=$key_pw
 PROPS
+    )
     chmod 600 "$props" "$keystore"
     cat >&2 <<'WARN'
 
@@ -129,7 +129,7 @@ echo "--- native libraries"
 scripts/check-apk-libs.sh "$apk"
 
 # 6. Fingerprint.
-cert_sha256=$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' dist/.certs.txt)
+cert_sha256=$(sed -n 's/^.*[Cc]ertificate SHA-256 digest: //p' dist/.certs.txt | head -n1)
 rm -f dist/.certs.txt
 [[ -n $cert_sha256 ]] || die "could not read the signing certificate fingerprint"
 size=$(stat -c %s "$apk")
