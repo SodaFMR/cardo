@@ -71,7 +71,7 @@ wake word -> speech-to-text -> understanding -> actions -> spoken + on-screen re
 
 1. A foreground microphone service runs a low-power keyword spotter on a short in-memory audio buffer.
 2. On a hit, the panel opens and voice activity detection finds the end of your sentence. Speech recognition transcribes it, including the wake word, which is checked a second time to reject false wakes.
-3. A small trained intent and slot model (ONNX, a few tens of MB) plus exact rules for times, dates, numbers and contact/app matching turn the text into a command. This is how iOS 15 Siri worked, not a chatbot.
+3. A small trained intent and slot model (ONNX, a few tens of MB) plus exact rules for times, dates, numbers and contact/app matching turn the text into a command. No chatbot: it only ever picks one of Cardo's known commands.
 4. A dialog manager asks one short question if something is missing and confirms risky actions. An executor for each domain runs the command.
 
 Keyword spotting, voice activity detection, speech recognition and speech synthesis use [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx); the understanding model runs on ONNX Runtime.
