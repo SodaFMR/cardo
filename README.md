@@ -6,11 +6,11 @@ A private, fully on-device voice assistant for Android. Say "Cardo", get things 
 [![Licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE)
 ![No INTERNET permission](https://img.shields.io/badge/permissions-no%20INTERNET-brightgreen)
 
-> **Status: in development, not usable yet.** The foundation is done; the voice, understanding, actions and UI tracks are being built and integrated. Nothing below is claimed to work until the table says "Done".
+> **Status: in development — no release yet.** The foundation is merged. Voice, understanding, UI and actions are being built in parallel and then integrated and tested end to end; the first release (v1.0) will be published under [Releases](https://github.com/SodaFMR/cardo/releases) once that is done. Features are marked "Done" only when they work in the app.
 
 ## What Cardo is
 
-Cardo aims to match iPhone 13-era (iOS 15) Siri for everyday phone tasks, then go further on privacy and speed:
+Cardo is a voice assistant for everyday phone tasks, built to be fast and private:
 
 - Wake it by saying "Cardo" (also "Hey Cardo" or "Oye Cardo"), or with the assistant gesture, or type to it.
 - A panel rises from the bottom of the screen with an animated cardo (thistle) flower.
