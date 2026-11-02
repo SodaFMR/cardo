@@ -14,7 +14,8 @@
 
 - Namespace `io.github.sodafmr.cardo.actions`; depends only on `:brain` (schema) and AndroidX. It must not request `INTERNET`.
 - Permissions are checked at execution time. A missing one returns `ActionResult.NeedsPermission(<CardoPermission>)`; `:actions` never requests permissions itself (the UI does).
-- Confirmation rules (also enforced here as a second line of defence): `CallNumber`, `SendMessage`, `ReplyMessage` execute only when `confirmed = true`, else return `NeedsConfirmation(command, preview)`.
+- Executors never return `NeedsUnlock` for lock-screen policy (an `:app` wrapper does that in P7). `Choice.id` alone must identify the resolved entity (phone choice = ContactsContract data row id, which implies the contact; contact choice = contact id; app = package; reminder = id); set `Choice.numberLabel` for number choices. `Failed(NOT_FOUND_CONTACT|NOT_FOUND_APP, detail, suggestion)` carries the closest name (score ≥ 0.6) in `suggestion`. `ReplyMessage.target` (an `IncomingMessage.key`) selects the thread; null = latest replyable.
+- Confirmation rules (executors own these): `CallNumber`, `SendMessage`, `ReplyMessage` execute only when `confirmed = true`, else return `NeedsConfirmation(command, preview)`.
 - Ambiguity: more than one contact/app match with score ≥ 0.85, or more than one number on the chosen contact without a matching `NumberLabel`, returns `NeedsChoice` (≤ 5 options, best first). `Choice.id` is the contact/data row id or package name.
 - Message notifications live in memory only and are dropped after being read or after 24 h. Reminders and notes are stored in app-private Room. Exclude them from backup (P7 adds `dataExtractionRules`).
 - Activities are started with `FLAG_ACTIVITY_NEW_TASK` from a non-activity context. A missing handler returns `Failed(NO_HANDLER_APP)`.
@@ -28,7 +29,7 @@
 2. A spoken phone number with a country prefix or spaces (`+34 612 34 56 78`) must dial exactly `+34612345678`.
 3. The user revokes a permission between two commands (contacts, calendar, notification access) — the next command must return `NeedsPermission`, not crash with `SecurityException`.
 4. Reminders must survive reboot and time-zone changes (rescheduled from `BOOT_COMPLETED` and `TIMEZONE_CHANGED`), and a reminder in the past fires immediately rather than never.
-5. Toggling the flashlight when the torch is already in the requested state must answer truthfully (`DeviceChanged("flashlight","on")`), and an emulator/phone without a flash must return `Failed(NOT_SUPPORTED)`.
+5. Toggling the flashlight when the torch is already in the requested state must answer truthfully (`DeviceChanged(DeviceSetting.FLASHLIGHT, on = true)`), and an emulator/phone without a flash must return `Failed(NOT_SUPPORTED)`.
 
 ---
 
@@ -127,7 +128,7 @@
   - `class MessageActions(context, permissions, contacts, launcher, sms: SmsSender, clock)`:
     - `send(c: SendMessage, chosen, confirmed)`. SMS: resolve the recipient → `NeedsConfirmation(preview = Outcome.MessageSent(name, SMS))` → on confirm, `SmsManager.divideMessage` + `sendMultipartTextMessage`. WhatsApp/Telegram/Signal: if a replyable stored message from that contact exists, reply through its `RemoteInput`; otherwise open the app with the text prefilled (WhatsApp `https://wa.me/<digits>?text=<encoded>` with the package set; Telegram/Signal `ACTION_SEND` text targeted to the package) → `Done(HandedOff(appLabel, body))`.
     - `read(c: ReadMessages)` → `Done(MessagesRead(list))` marking them read, or `Failed(NOTHING_TO_READ)`. Without notification access → `NeedsPermission(NOTIFICATION_ACCESS)`.
-    - `reply(c: ReplyMessage, confirmed)` replies to `latestReplyable()`.
+    - `reply(c: ReplyMessage, confirmed)` replies to the stored message whose key is `c.target`, else `latestReplyable()`.
     - `email(c: ComposeEmail)` → `ACTION_SENDTO mailto:` with subject/body → `Done(HandedOff(…))`.
 
 - [ ] **Step 1:** Write tests:
@@ -266,7 +267,7 @@
   - Battery: `BatteryManager.BATTERY_PROPERTY_CAPACITY` and `isCharging`.
 
 - [ ] **Step 1:** Write tests:
-  - flashlight ON when already on → `DeviceChanged("flashlight","on")` and no second `setTorchMode`
+  - flashlight ON when already on → `DeviceChanged(FLASHLIGHT, on = true)` and no second `setTorchMode`
   - no flash → `NOT_SUPPORTED`
   - media volume 50% on a 0..15 stream → index 7 or 8 (round half up = 8)
   - SILENT without DND access → `NeedsPermission(DND_ACCESS)`

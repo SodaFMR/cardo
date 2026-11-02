@@ -16,7 +16,8 @@
 - Do not change any type or signature defined in P1's `schema/`, `dialog/DialogContracts.kt`, `nlu/UnderstandingContracts.kt`, `nlu/ModelContract.kt`. Add new types in new files only.
 - "Now" always comes from an injected `java.time.Clock`; tests use fixed clocks (default fixture: `2026-11-04T10:15` local, a Wednesday, zone `Europe/Madrid`).
 - Confidence policy: ≥ 0.85 act; 0.50–0.85 ask between the top two; < 0.50 out of scope with a web-search offer.
-- Confirm before: calling a raw number, sending any message (SMS, reply, WhatsApp/Telegram), creating an event whose time was not stated.
+- Ownership (P1 schema KDoc): executors return `NeedsConfirmation` for a raw number, any message (SMS, reply, WhatsApp/Telegram); the dialog then reads back and waits for yes/no. The dialog itself **asks** for unstated values before `Run` (e.g. an event or reminder without a time). Executors never return `NeedsUnlock` for policy reasons — the lock-screen policy lives in an `:app` wrapper (P7).
+- Schema facts to use (from P1 fixes): `Choice(id, label, detail, numberLabel)` — Brain localizes `numberLabel`; `Choice.id` alone identifies the resolved entity, so a re-run passes only the latest `chosen`. `Failed.suggestion` → "Did you mean …?" / "¿Querías decir …?". `ReplyMessage.target` = the `IncomingMessage.key` to answer. `Outcome.DeviceChanged(setting: DeviceSetting, on, percent, ringer)` is typed. `Card.Reminders`, `Card.Calls` exist; `Card.Alarm` has a `date`.
 - Bare hour with no am/pm or day-part (alarms, reminders, events): choose the **next future occurrence** among `h:00` and `(h+12):00`.
 - Day-part defaults: morning/mañana 09:00, noon/mediodía 12:00, afternoon/tarde 16:00, evening 19:00, tonight/esta noche 21:00, midnight/medianoche 00:00 next day.
 - Copy tone: warm, brief, confident. One sentence where possible. Never say "As an AI".
@@ -293,7 +294,7 @@
   - While waiting for a slot, first try parsing the answer with that slot's parser. Contact/app/name slots take the raw remainder. If the answer instead interprets as a different intent at ≥ 0.85 (other than yes/no/cancel), start that command (Review Focus 4).
   - While waiting for a choice, match ordinals ("the first one", "el segundo"), number labels ("mobile/móvil/casa/trabajo") or option labels via `EntityMatcher`.
   - While waiting for confirmation: Yes → `Run(cmd, confirmed=true)`; No/Cancel → `cancelled`, then `Close` on the next turn.
-  - Apply the confidence policy and confirmation rules from Global Constraints.
+  - Apply the confidence policy. Ask for missing required slots and for an unstated time on `CreateEvent`/`CreateReminder` before `Run`. After `onResult(Done(MessagesRead(list)))`, remember the last message's key so a following `ReplyMessage` is sent with `target` set.
   - `Repeat` replays the last `Reply`. `Cancel` replies `cancelled` with `listen=false`.
   - `onResult` maps each `ActionResult` per the spec §5/§10 table: `NeedsChoice`/`NeedsConfirmation` keep the turn open (`listen=true`); `Done`/`Failed`/`NeedsPermission`/`NeedsUnlock` end it (`listen=false`).
   - The language for all replies is the latest `Interpretation.lang`; before any interpretation it's `SessionInfo.langHint`.
