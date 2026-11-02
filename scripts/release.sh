@@ -76,11 +76,12 @@ if [[ ! -f $keystore ]]; then
     mkdir -p "$keys_dir"
     chmod 700 "$keys_dir"
     random32() { head -c 256 /dev/urandom | base64 -w0 | tr -dc 'A-Za-z0-9' | head -c 32; }
+    # PKCS12 (the default keystore type) uses one password for the store and its keys.
     store_pw=$(random32)
-    key_pw=$(random32)
-    [[ ${#store_pw} -eq 32 && ${#key_pw} -eq 32 ]] || die "could not generate passwords"
-    STORE_PW=$store_pw KEY_PW=$key_pw keytool -genkeypair -keystore "$keystore" \
-        -storepass:env STORE_PW -keypass:env KEY_PW \
+    key_pw=$store_pw
+    [[ ${#store_pw} -eq 32 ]] || die "could not generate a password"
+    STORE_PW=$store_pw keytool -genkeypair -keystore "$keystore" -storetype PKCS12 \
+        -storepass:env STORE_PW \
         -alias cardo -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Cardo" >/dev/null
     umask 077
     cat > "$props" <<PROPS
