@@ -15,6 +15,10 @@ data class Interpretation(
     val lang: Lang,
 )
 
+/**
+ * Stateless; follow-up answers to a pending question ("at 7", "la segunda") are parsed by the dialog manager
+ * with slot parsers, not by Understanding.
+ */
 interface Understanding {
     fun interpret(text: String, langHint: Lang): Interpretation
 }

@@ -34,8 +34,7 @@ sealed interface Outcome {
 
     data class AppOpened(val label: String) : Outcome
 
-    /** [what] is one of "flashlight", "volume", "ringer", "dnd", "brightness". */
-    data class DeviceChanged(val what: String, val newValue: String?) : Outcome
+    data class DeviceChanged(val setting: DeviceSetting, val on: Boolean? = null, val percent: Int? = null, val ringer: RingerMode? = null) : Outcome
 
     data class PanelOpened(val setting: SettingPanel) : Outcome
 
@@ -78,16 +77,34 @@ sealed interface ActionResult {
 
     data class NeedsUnlock(val command: Command) : ActionResult
 
-    data class Failed(val reason: FailReason, val detail: String? = null) : ActionResult
+    /** [suggestion] is the closest match (e.g. a contact name), when there is one. */
+    data class Failed(val reason: FailReason, val detail: String? = null, val suggestion: String? = null) : ActionResult
 }
 
-/** [id] is opaque to Brain; [label] is spoken/displayed. */
-data class Choice(val id: String, val label: String, val detail: String?)
+/**
+ * `Choice.id` must fully identify what was resolved: for a phone-number choice it is the ContactsContract data
+ * row id (which implies the contact); for a contact choice the contact id; for an app the package name; for a
+ * reminder its id. Executors re-resolve everything from the latest `chosen` alone.
+ *
+ * [label] is a proper name (contact/app/reminder text, language-neutral); language-dependent words come from
+ * [numberLabel], which Brain localizes.
+ */
+data class Choice(val id: String, val label: String, val detail: String?, val numberLabel: NumberLabel? = null)
 
 enum class CardoPermission { MICROPHONE, CONTACTS, CALL_PHONE, CALL_LOG, SMS, CALENDAR, NOTIFICATIONS_POST, NOTIFICATION_ACCESS, DND_ACCESS, WRITE_SETTINGS, EXACT_ALARMS }
 
 enum class FailReason { NOT_FOUND_CONTACT, NOT_FOUND_APP, NO_HANDLER_APP, NO_NUMBER, NOTHING_TO_READ, NOTHING_TO_REPLY, NOT_SUPPORTED, INVALID_VALUE, ERROR }
 
+/**
+ * `Choice.id` must fully identify what was resolved: for a phone-number choice it is the ContactsContract data
+ * row id (which implies the contact); for a contact choice the contact id; for an app the package name; for a
+ * reminder its id. Executors re-resolve everything from the latest `chosen` alone.
+ *
+ * Executors own `NeedsConfirmation` (they hold the resolved readback: recipient name, number) for CallNumber,
+ * SendMessage, ReplyMessage. Executors never return `NeedsUnlock`; the lock-screen policy is applied by a
+ * wrapper executor in `:app`. Missing or unstated values (e.g. an event without a time) are asked by the
+ * dialog before `Run`, never confirmed by executors.
+ */
 interface ActionExecutor {
     suspend fun execute(command: Command, chosen: Choice? = null, confirmed: Boolean = false): ActionResult
 }

@@ -30,6 +30,8 @@ enum class VolumeAction { UP, DOWN, SET, MUTE, UNMUTE, MAX }
 
 enum class LevelAction { UP, DOWN, SET, MAX, MIN }
 
+enum class DeviceSetting { FLASHLIGHT, VOLUME, RINGER, DND, BRIGHTNESS }
+
 enum class RingerMode { SILENT, VIBRATE, NORMAL }
 
 enum class SettingPanel { WIFI, BLUETOOTH, MOBILE_DATA, AIRPLANE, DARK_MODE, BATTERY_SAVER, LOCATION, NFC, HOTSPOT }

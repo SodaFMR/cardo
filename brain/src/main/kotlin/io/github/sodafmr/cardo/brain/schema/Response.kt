@@ -8,7 +8,7 @@ data class Response(val display: String, val speech: String, val lang: Lang, val
 sealed interface Card {
     data class Timer(val duration: java.time.Duration, val label: String?) : Card
 
-    data class Alarm(val time: java.time.LocalTime, val repeat: Recurrence, val label: String?) : Card
+    data class Alarm(val time: java.time.LocalTime, val date: java.time.LocalDate? = null, val repeat: Recurrence, val label: String?) : Card
 
     data class Contact(val name: String, val digits: String?, val label: NumberLabel?) : Card
 
@@ -17,6 +17,10 @@ sealed interface Card {
     data class Messages(val items: List<IncomingMessage>) : Card
 
     data class Events(val range: DateRange, val items: List<EventItem>) : Card
+
+    data class Reminders(val items: List<ReminderItem>) : Card
+
+    data class Calls(val entries: List<CallEntry>) : Card
 
     data class Reminder(val task: String, val at: java.time.LocalDateTime) : Card
 

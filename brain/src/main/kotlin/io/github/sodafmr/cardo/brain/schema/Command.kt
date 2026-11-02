@@ -17,7 +17,8 @@ data class SendMessage(val recipient: Recipient?, val body: String?, val app: Me
 
 data class ReadMessages(val contact: String?, val app: MessagingApp) : Command { override val intent = "message.read" }
 
-data class ReplyMessage(val body: String?) : Command { override val intent = "message.reply" }
+/** [target] is the [IncomingMessage.key] to reply to; null = latest replyable. */
+data class ReplyMessage(val body: String?, val target: String? = null) : Command { override val intent = "message.reply" }
 
 data class ComposeEmail(val recipient: String?, val subject: String?, val body: String?) : Command { override val intent = "email.compose" }
 
@@ -75,8 +76,13 @@ data class TellTime(val place: String?) : Command { override val intent = "info.
 
 data class TellDate(val date: java.time.LocalDate?) : Command { override val intent = "info.date" }
 
+/** [expression] is the normalized spoken expression text, parsed by `MathParser`. */
 data class Calculate(val expression: String?) : Command { override val intent = "calc.evaluate" }
 
+/**
+ * [from] and [to] are unit phrases as spoken, resolved by `Units.resolve`. Local answers (time, date, calc,
+ * convert) are executed by `:actions` InfoActions using `:brain` parsers.
+ */
 data class ConvertUnits(val value: Double?, val from: String?, val to: String?) : Command { override val intent = "convert.units" }
 
 data class WebSearch(val query: String?) : Command { override val intent = "web.search" }

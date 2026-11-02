@@ -14,7 +14,7 @@ class IntentCatalogTest {
         CallHistory(false),
         SendMessage(null, null, MessagingApp.ANY),
         ReadMessages(null, MessagingApp.ANY),
-        ReplyMessage(null),
+        ReplyMessage(null, null),
         ComposeEmail(null, null, null),
         SetAlarm(null, null, Recurrence(emptySet()), null),
         ShowAlarms,
