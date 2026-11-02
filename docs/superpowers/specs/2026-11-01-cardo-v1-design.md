@@ -6,7 +6,7 @@ Supersedes: [2026-06-26-cardo-mvp-design.md](2026-06-26-cardo-mvp-design.md)
 
 ## 1. Goal
 
-Cardo is a private voice assistant for Android that matches iPhone 13 (iOS 15) Siri for everyday phone tasks, and goes further on privacy and speed. It wakes when you say "Cardo", opens a panel from the bottom of the screen with an animated cardo (thistle) flower, understands natural English and Spanish, acts in well under a second, and never sends anything off the phone.
+Cardo is a private voice assistant for Android that handles everyday phone tasks by voice, fast and fully private. It wakes when you say "Cardo", opens a panel from the bottom of the screen with an animated cardo (thistle) flower, understands natural English and Spanish, acts in well under a second, and never sends anything off the phone.
 
 The public promise, in one line: **Cardo has no internet permission. Your voice, contacts and requests never leave your phone.**
 
@@ -19,16 +19,16 @@ The public promise, in one line: **Cardo has no internet permission. Your voice,
 | Package | `io.github.sodafmr.cardo` | F-Droid friendly; needs no domain |
 | Wake word | "Cardo", with "Hey Cardo" and "Oye Cardo" also accepted | Owner's choice |
 | Wake path | Cardo runs its own low-power keyword detector inside a microphone foreground service | Android's DSP hotword APIs (`AlwaysOnHotwordDetector`, `HotwordDetectionService`) are reserved for privileged, preinstalled assistants. Android explicitly allows "an app which provides the `VoiceInteractionService`" to start a microphone foreground service from the background ([docs](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start#wiu-restrictions)) |
-| Default listening | Always, including screen off; user can switch to "screen on + charging", "charging only" or "off" | Owner's choice; most Siri-like |
+| Default listening | Always, including screen off; user can switch to "screen on + charging", "charging only" or "off" | Owner's choice; most hands-free |
 | Speech engine | [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) for keyword spotting, voice activity detection, speech recognition and speech synthesis; exact models chosen by the bake-off in section 6 | One Apache-2.0 offline runtime; models are swappable; lets the app ship without `INTERNET` |
-| Understanding | A small trained intent + slot model (Siri-style, about 30–40 MB, ONNX) plus exact rules for times/dates/numbers, personal entity matching and scripted dialog flows | iOS 15 Siri used task-specific ML understanding, not a chatbot. A chatbot LLM would add 400 MB+, 1–2 s per command and invented details |
-| Languages | English and Spanish, detected per utterance; Cardo answers in the language it heard | Owner is bilingual; Siri cannot do this, Cardo can |
+| Understanding | A small trained intent + slot model (task-specific, about 30–40 MB, ONNX) plus exact rules for times/dates/numbers, personal entity matching and scripted dialog flows | iOS 15 Siri used task-specific ML understanding, not a chatbot. A chatbot LLM would add 400 MB+, 1–2 s per command and invented details |
+| Languages | English and Spanish, detected per utterance; Cardo answers in the language it heard | Owner is bilingual; no language switching needed |
 | Timers and alarms | Delegated to the phone's Clock app through `AlarmClock` intents | Ringing reliability matters more than voice-querying the remaining time |
 | Reminders and notes | Owned by Cardo, stored on the phone | Works offline and fully under Cardo's control |
 | Verification | Emulator plus host-side benchmarks now; real-device checklist recorded for later | No physical phone available yet |
 | Repository | `github.com/SodaFMR/cardo`, private until the v1 release, then public | Avoids publishing half-built code; flipping to public is one command |
 
-The June 2026 MVP doc assumed the OS hotword path and "no AI". Both are replaced: the OS path is not available to third-party apps, and Siri-level understanding needs a small trained model.
+The June 2026 MVP doc assumed the OS hotword path and "no AI". Both are replaced: the OS path is not available to third-party apps, and natural-language understanding needs a small trained model.
 
 ## 3. Capability scope
 

@@ -326,6 +326,6 @@ NLU artifact contract (documented in KDoc of `ModelContract.kt` and in `ml/READM
 - Produces: workflow `ci` on push/PR to `main`: JDK 17 (temurin), `android-actions/setup-android`, cache `~/.cache/cardo-artifacts` and Gradle, run `./gradlew build --stacktrace` (includes `check`, the privacy task, unit tests).
 
 - [ ] **Step 1:** Write the workflow.
-- [ ] **Step 2:** `gh repo create SodaFMR/cardo --private --source . --remote origin --description "Private, offline voice assistant for Android — like iPhone 13 Siri, nothing leaves your phone"` then `git push -u origin main`.
+- [ ] **Step 2:** `gh repo create SodaFMR/cardo --private --source . --remote origin --description "Private, offline voice assistant for Android — nothing leaves your phone"` then `git push -u origin main`.
 - [ ] **Step 3:** `gh run watch` on the triggered run → success. If it fails only due to CI environment differences, fix and push; record any CI-only workaround in a workflow comment.
 - [ ] **Step 4:** Commit (if anything changed) `ci: build and test on push`.
